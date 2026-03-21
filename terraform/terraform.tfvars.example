@@ -1,0 +1,9 @@
+# Copy this file to terraform.tfvars and fill in the values
+# Never commit terraform.tfvars to version control
+
+terraform_state_bucket_name = "<your-aws-account-id>-stocks-monitor-state-files"
+claude_api_key_secret_name  = "<your-secret-name-in-secrets-manager>"
+lambda_function_name        = "stocks-monitor-agent"
+lambda_zip_path             = "../lambda.zip"
+lambda_timeout_seconds      = 60
+lambda_memory_mb            = 256
