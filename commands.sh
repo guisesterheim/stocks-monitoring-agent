@@ -63,3 +63,16 @@ aws bedrock-agentcore invoke-agent-runtime \
   --runtime-session-id "manual-StocksMonitorRuntime-00001" \
   --payload "$PAYLOAD" \
   output.bin
+
+
+docker run -p 8080:8080 \
+  -e RECIPIENT_EMAIL_ADDRESSES="[\"exmokvra@gmail.com\"]" \
+  -e AWS_REGION_NAME="us-east-1" \
+  -e CLAUDE_MODEL_ID="amazon.nova-micro-v1:0" \
+  -e DAILY_DROP_THRESHOLD_PERCENT="2" \
+  -e SENDER_EMAIL_ADDRESS="stocks-agent@sesterheim.com.br" \
+  -e SNS_TOPIC_ARN="arn:aws:sns:us-east-1:959689756284:stocks-monitor-alerts" \
+  -e STOCKS_TABLE_NAME="stocks-monitor-stocks-list" \
+  -e USE_SES="false" \
+  -e WEEKLY_DROP_THRESHOLD_PERCENT="5" \
+  959689756284.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:latest

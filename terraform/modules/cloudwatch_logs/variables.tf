@@ -1,8 +1,3 @@
-variable "agentcore_runtime_name" {
-  type        = string
-  description = "Name of the AgentCore Runtime — used to derive the log group name"
-}
-
 variable "log_retention_days" {
   type        = number
   description = "Number of days to retain logs in all managed log groups"

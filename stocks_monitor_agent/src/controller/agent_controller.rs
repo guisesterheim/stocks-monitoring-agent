@@ -10,9 +10,10 @@ use crate::model::email_template::build_alert_email_html;
 use crate::model::stock_data::StockAlertEvaluation;
 use crate::repository::{browser_repository, dynamodb_repository, notification_repository};
 
-/// Handles the HTTP POST /invoke request from AgentCore Runtime (triggered by EventBridge)
+/// Handles the HTTP POST /invocations request from AgentCore Runtime (triggered by EventBridge).
+/// Uses raw Bytes extractor to accept any Content-Type (AgentCore sends application/octet-stream).
 pub async fn handle_invocation(
-    Json(_payload): Json<Value>,
+    _body: axum::body::Bytes,
 ) -> Result<Json<Value>, StatusCode> {
     run_stocks_monitor_pipeline()
         .await

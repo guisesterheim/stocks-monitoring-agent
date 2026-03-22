@@ -19,7 +19,6 @@ module "sns" {
 
 module "cloudwatch_logs" {
   source                   = "./modules/cloudwatch_logs"
-  agentcore_runtime_name   = var.agentcore_runtime_name
   log_retention_days       = var.log_retention_days
   existing_log_group_names = var.existing_log_group_names
 }
@@ -43,7 +42,6 @@ module "agentcore_runtime" {
   daily_drop_threshold_percent   = var.daily_drop_threshold_percent
   weekly_drop_threshold_percent  = var.weekly_drop_threshold_percent
   claude_model_id                = var.claude_model_id
-  log_group_name                 = module.cloudwatch_logs.agentcore_runtime_log_group_arn
 }
 
 module "lambda" {

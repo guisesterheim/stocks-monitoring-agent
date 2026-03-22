@@ -1,4 +1,4 @@
-output "agentcore_runtime_log_group_arn" {
-  description = "ARN of the CloudWatch log group for the AgentCore Runtime"
-  value       = aws_cloudwatch_log_group.agentcore_runtime.arn
+output "managed_log_group_names" {
+  description = "Names of the CloudWatch log groups with managed retention"
+  value       = [for lg in aws_cloudwatch_log_group.existing : lg.name]
 }
