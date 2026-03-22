@@ -1,16 +1,25 @@
 use serde::{Deserialize, Serialize};
 
-/// Represents a single stock data point
-#[derive(Debug, Serialize, Deserialize)]
-pub struct StockData {
+/// A stock or index being monitored
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MonitoredStock {
     pub ticker: String,
-    pub price: f64,
-    pub change_percent: f64,
 }
 
-/// Represents the Claude API analysis result for a set of stocks
-#[derive(Debug, Serialize, Deserialize)]
-pub struct StockAnalysisResult {
-    pub summary: String,
-    pub notable_moves: Vec<StockData>,
+/// A closing price record for a given ticker on a given date
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StockClosingPrice {
+    pub ticker: String,
+    pub date: String,
+    pub closing_price: f64,
+}
+
+/// The result of evaluating alert rules for a single ticker
+#[derive(Debug, Clone)]
+pub struct StockAlertEvaluation {
+    pub ticker: String,
+    pub daily_change_percent: Option<f64>,
+    pub weekly_change_percent: Option<f64>,
+    pub daily_alert_triggered: bool,
+    pub weekly_alert_triggered: bool,
 }

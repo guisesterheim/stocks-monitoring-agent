@@ -1,6 +1,5 @@
 use anyhow::Result;
-use lambda_runtime::{run, service_fn, Error, LambdaEvent};
-use serde_json::Value;
+use axum::{routing::post, Router};
 use tracing_subscriber::EnvFilter;
 
 mod controller;
@@ -8,17 +7,18 @@ mod model;
 mod repository;
 
 #[tokio::main]
-async fn main() -> Result<(), Error> {
+async fn main() -> Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .json()
         .init();
 
-    run(service_fn(handle_lambda_event)).await
-}
+    let app = Router::new()
+        .route("/invoke", post(controller::agent_controller::handle_invocation));
 
-async fn handle_lambda_event(event: LambdaEvent<Value>) -> Result<Value, Error> {
-    controller::stocks_controller::run_stocks_monitor_pipeline(event)
-        .await
-        .map_err(|error| Error::from(error.to_string().as_str()))
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await?;
+    tracing::info!("Stocks monitor agent listening on port 8080");
+
+    axum::serve(listener, app).await?;
+    Ok(())
 }

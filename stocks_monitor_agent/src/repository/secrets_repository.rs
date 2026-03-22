@@ -11,7 +11,7 @@ pub async fn fetch_secret_value(
         .secret_id(secret_name)
         .send()
         .await
-        .with_context(|| format!("Failed to fetch secret: {}", secret_name))?;
+        .with_context(|| format!("Failed to fetch secret '{}'", secret_name))?;
 
     response
         .secret_string()
