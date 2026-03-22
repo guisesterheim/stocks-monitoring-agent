@@ -4,7 +4,33 @@
 # Pipeline Commands
 # ============================================================
 
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+# ---- AWS Authentication ------------------------------------
+
+AWS_CREDENTIALS_CACHE_DIR="/Users/guisester/.aws/login/cache"
+
+# Find the single credentials file in the cache folder
+AWS_CREDENTIALS_FILE=$(ls "$AWS_CREDENTIALS_CACHE_DIR"/*.json 2>/dev/null | head -n 1)
+
+if [ -z "$AWS_CREDENTIALS_FILE" ]; then
+  echo "ERROR: No credentials file found in $AWS_CREDENTIALS_CACHE_DIR"
+  echo "Please authenticate to AWS first."
+fi
+
+# Export credentials from the cached file
+export AWS_ACCESS_KEY_ID=$(cat "$AWS_CREDENTIALS_FILE" | jq -r .accessToken.accessKeyId)
+export AWS_SECRET_ACCESS_KEY=$(cat "$AWS_CREDENTIALS_FILE" | jq -r .accessToken.secretAccessKey)
+export AWS_SESSION_TOKEN=$(cat "$AWS_CREDENTIALS_FILE" | jq -r .accessToken.sessionToken)
+
+# Verify the credentials are valid and the CLI is authenticated
+echo "Verifying AWS authentication..."
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>/dev/null)
+
+if [ $? -ne 0 ] || [ -z "$AWS_ACCOUNT_ID" ]; then
+  echo "ERROR: AWS authentication failed. Credentials may be expired."
+  echo "Please re-authenticate and try again."
+fi
+
+echo "Authenticated to AWS account: $AWS_ACCOUNT_ID"
 
 # ---- CloudFormation ----------------------------------------
 

@@ -5,7 +5,7 @@ Goal: monitor and notify registered emails about stock market moves over a certa
 ## Architecture
 
 - AWS Lambda runs a Rust-based AI agent
-- The agent scrapes stock data from cnbc.com
+- The agent uses Claude API to get stock data
 - Claude API analyzes the scraped data on every Lambda invocation
 - Notifications are sent via AWS SES to registered emails
 - Infrastructure is managed with Terraform, secrets stored in AWS Secrets Manager
@@ -18,7 +18,7 @@ Goal: monitor and notify registered emails about stock market moves over a certa
 
 - Language: Rust (Lambda handler)
 - AI: Claude API (Anthropic) for stock data analysis
-- Data source: cnbc.com (scraped on each Lambda invocation)
+- Data source: Claude API (on each Lambda invocation)
 - Infrastructure: Terraform + CloudFormation (bootstrap only)
 - Notifications: AWS SES
 - Secrets: AWS Secrets Manager (all secrets, API keys, credentials)
@@ -42,8 +42,7 @@ Since this project targets developers new to Rust, follow these guidelines:
 ### Dependencies (preferred crates)
 - `tokio` — async runtime
 - `serde` / `serde_json` — serialization
-- `reqwest` — HTTP client (for cnbc.com scraping and Claude API calls)
-- `scraper` — HTML parsing for cnbc.com
+- `reqwest` — HTTP client (for Claude API calls)
 - `aws-sdk-sesv2` — sending emails via SES
 - `aws-sdk-secretsmanager` — fetching secrets at runtime
 - `aws-lambda-rust-runtime` — Lambda handler
@@ -74,7 +73,7 @@ src/
 1. Aim for simplicity — if it's hard to read, simplify it
 2. No Rust file can exceed 200 lines
 3. No folder can contain more than 10 files
-4. Use clear, verbose naming — prefer `fetch_stock_price_from_cnbc` over `fetch`
+4. Use clear, verbose naming — prefer `fetch_stock_price_from_claude` over `fetch`
 5. Separate files by general responsibility, matching the folder structure above
 
 ## Terraform Conventions

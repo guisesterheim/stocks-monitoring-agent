@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// Represents a single stock data point scraped from cnbc.com
+/// Represents a single stock data point
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StockData {
     pub ticker: String,
