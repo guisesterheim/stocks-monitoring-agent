@@ -58,21 +58,26 @@ terraform -chdir=terraform apply \
 
 
 PAYLOAD=$(echo -n '{"prompt": "run"}' | base64)
+RUNTIME_ARN=$(terraform -chdir=terraform output -raw agentcore_runtime_arn)
 aws bedrock-agentcore invoke-agent-runtime \
-  --agent-runtime-arn "arn:aws:bedrock-agentcore:us-east-1:959689756284:runtime/StocksMonitorRuntime-Qf8ct582B9" \
-  --runtime-session-id "manual-StocksMonitorRuntime-00001" \
+  --region us-east-1 \
+  --agent-runtime-arn "$RUNTIME_ARN" \
+  --runtime-session-id "$(uuidgen)" \
+  --content-type "application/json" \
+  --accept "application/json" \
   --payload "$PAYLOAD" \
   output.bin
 
 
+SNS_TOPIC_ARN=$(terraform -chdir=terraform output -raw sns_topic_arn)
 docker run -p 8080:8080 \
   -e RECIPIENT_EMAIL_ADDRESSES="[\"exmokvra@gmail.com\"]" \
   -e AWS_REGION_NAME="us-east-1" \
   -e CLAUDE_MODEL_ID="amazon.nova-micro-v1:0" \
   -e DAILY_DROP_THRESHOLD_PERCENT="2" \
   -e SENDER_EMAIL_ADDRESS="stocks-agent@sesterheim.com.br" \
-  -e SNS_TOPIC_ARN="arn:aws:sns:us-east-1:959689756284:stocks-monitor-alerts" \
+  -e SNS_TOPIC_ARN="$SNS_TOPIC_ARN" \
   -e STOCKS_TABLE_NAME="stocks-monitor-stocks-list" \
   -e USE_SES="false" \
   -e WEEKLY_DROP_THRESHOLD_PERCENT="5" \
-  959689756284.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:latest
+  "${ECR_AGENT_URL}:latest"
