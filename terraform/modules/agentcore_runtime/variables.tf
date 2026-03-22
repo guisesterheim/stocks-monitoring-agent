@@ -48,3 +48,8 @@ variable "claude_model_id" {
   type        = string
   description = "Bedrock model ID for Claude (e.g. amazon.nova-micro-v1:0)"
 }
+
+variable "log_group_name" {
+  type        = string
+  description = "Log group name to send logs to"
+}

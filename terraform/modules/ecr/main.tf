@@ -1,5 +1,7 @@
-resource "aws_ecr_repository" "agent_repository" {
-  name                 = var.repository_name
+resource "aws_ecr_repository" "repositories" {
+  for_each = var.repository_names
+
+  name                 = each.value
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -11,8 +13,10 @@ resource "aws_ecr_repository" "agent_repository" {
   }
 }
 
-resource "aws_ecr_lifecycle_policy" "agent_repository_lifecycle" {
-  repository = aws_ecr_repository.agent_repository.name
+resource "aws_ecr_lifecycle_policy" "repositories_lifecycle" {
+  for_each = var.repository_names
+
+  repository = aws_ecr_repository.repositories[each.key].name
 
   policy = jsonencode({
     rules = [{

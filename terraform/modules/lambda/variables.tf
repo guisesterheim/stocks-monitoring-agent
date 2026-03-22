@@ -1,8 +1,3 @@
-variable "ecr_repository_name" {
-  type        = string
-  description = "Name of the ECR repository for the Lambda invoker container image"
-}
-
 variable "lambda_role_name" {
   type        = string
   description = "Name of the IAM role for the Lambda invoker function"

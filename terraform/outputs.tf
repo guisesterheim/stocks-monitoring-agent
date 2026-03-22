@@ -1,11 +1,11 @@
 output "ecr_repository_url" {
   description = "ECR repository URL to push the agent container image to"
-  value       = module.ecr.repository_url
+  value       = module.ecr.repository_urls["agent"]
 }
 
 output "lambda_invoker_ecr_repository_url" {
   description = "ECR repository URL to push the Lambda invoker container image to"
-  value       = module.lambda.ecr_repository_url
+  value       = module.ecr.repository_urls["lambda_invoker"]
 }
 
 output "agentcore_runtime_arn" {

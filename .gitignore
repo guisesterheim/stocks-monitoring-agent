@@ -39,4 +39,3 @@ terraform.rc
 target
 
 authenticate.sh
-login.sh

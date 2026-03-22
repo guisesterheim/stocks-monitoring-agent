@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::{routing::post, Router};
+use axum::{routing::{get, post}, Router};
 use tracing_subscriber::EnvFilter;
 
 mod controller;
@@ -14,7 +14,8 @@ async fn main() -> Result<()> {
         .init();
 
     let app = Router::new()
-        .route("/invoke", post(controller::agent_controller::handle_invocation));
+        .route("/invocations", post(controller::agent_controller::handle_invocation))
+        .route("/ping", get(|| async { "healthy" }));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await?;
     tracing::info!("Stocks monitor agent listening on port 8080");

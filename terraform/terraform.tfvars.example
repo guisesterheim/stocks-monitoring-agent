@@ -30,4 +30,12 @@ recipient_email_addresses = [
 # SES notification (optional) — leave empty or remove to use SNS only.
 # If provided, SES will be used instead of SNS.
 # The SES identity must already be verified (managed by another repo).
-# ses_sender_email_address = "stocks-agent@sesterheim.com.br"
+# ses_sender_email_address = "<sender-email>"
+
+# CloudWatch log retention (days)
+log_retention_days = 7
+
+# Existing log groups to manage retention on (e.g. Lambda function log groups)
+existing_log_group_names = [
+  "/aws/lambda/<your-lambda-function-name>"
+]

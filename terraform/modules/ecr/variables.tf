@@ -1,4 +1,4 @@
-variable "repository_name" {
-  type        = string
-  description = "Name of the ECR repository for the agent container image"
+variable "repository_names" {
+  type        = map(string)
+  description = "Map of logical key to ECR repository name (e.g. { agent = \"my-agent\", lambda_invoker = \"my-invoker\" })"
 }

@@ -1,6 +1,9 @@
 module "ecr" {
-  source          = "./modules/ecr"
-  repository_name = var.ecr_repository_name
+  source = "./modules/ecr"
+  repository_names = {
+    agent          = var.ecr_repository_name
+    lambda_invoker = var.lambda_invoker_ecr_repository_name
+  }
 }
 
 module "dynamodb" {
@@ -12,6 +15,13 @@ module "sns" {
   source                    = "./modules/sns"
   topic_name                = var.sns_topic_name
   recipient_email_addresses = var.recipient_email_addresses
+}
+
+module "cloudwatch_logs" {
+  source                   = "./modules/cloudwatch_logs"
+  agentcore_runtime_name   = var.agentcore_runtime_name
+  log_retention_days       = var.log_retention_days
+  existing_log_group_names = var.existing_log_group_names
 }
 
 module "iam" {
@@ -33,11 +43,11 @@ module "agentcore_runtime" {
   daily_drop_threshold_percent   = var.daily_drop_threshold_percent
   weekly_drop_threshold_percent  = var.weekly_drop_threshold_percent
   claude_model_id                = var.claude_model_id
+  log_group_name                 = module.cloudwatch_logs.agentcore_runtime_log_group_arn
 }
 
 module "lambda" {
   source                = "./modules/lambda"
-  ecr_repository_name   = var.lambda_invoker_ecr_repository_name
   lambda_role_name      = var.lambda_invoker_role_name
   function_name         = var.lambda_invoker_function_name
   container_image_uri   = var.lambda_invoker_image_uri

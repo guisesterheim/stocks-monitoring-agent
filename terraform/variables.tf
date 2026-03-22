@@ -80,3 +80,15 @@ variable "eventbridge_schedule_name" {
   type        = string
   description = "Name of the EventBridge Scheduler schedule"
 }
+
+variable "log_retention_days" {
+  type        = number
+  description = "Number of days to retain logs in all CloudWatch log groups"
+  default     = 7
+}
+
+variable "existing_log_group_names" {
+  type        = list(string)
+  description = "List of existing CloudWatch log group names to manage retention on (e.g. Lambda log groups)"
+  default     = []
+}

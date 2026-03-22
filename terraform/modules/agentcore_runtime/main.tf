@@ -27,3 +27,24 @@ resource "awscc_bedrockagentcore_runtime" "stocks_monitor_runtime" {
     USE_SES                       = var.sender_email_address != "" ? "true" : "false"
   }
 }
+
+resource "aws_cloudwatch_log_delivery_destination" "application" {
+  name          = "agentcore-application-log-destination"
+  output_format = "json" # Can also be "plaintext" or "clf"
+
+  delivery_destination_configuration {
+    destination_resource_arn = var.log_group_name
+  }
+}
+
+resource "aws_cloudwatch_log_delivery_source" "application_source" {
+  name     = "agentcore-application-log-source"
+  log_type = "APPLICATION_LOGS"
+  # Replace with the actual ARN of your agent runtime resource
+  resource_arn = awscc_bedrockagentcore_runtime.stocks_monitor_runtime.agent_runtime_arn
+}
+
+resource "aws_cloudwatch_log_delivery" "application_delivery" {
+  delivery_source_name     = aws_cloudwatch_log_delivery_source.application_source.name
+  delivery_destination_arn = aws_cloudwatch_log_delivery_destination.application.arn
+}

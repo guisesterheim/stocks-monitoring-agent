@@ -7,7 +7,7 @@ resource "aws_scheduler_schedule" "daily_stock_monitor_trigger" {
   }
 
   # 3:30 PM EST — EventBridge Scheduler cron format: (minutes hours day-of-month month day-of-week year)
-  schedule_expression          = "cron(30 15 * * ? *)"
+  schedule_expression          = "cron(30 15 ? * MON-FRI *)"
   schedule_expression_timezone = "America/New_York"
 
   target {

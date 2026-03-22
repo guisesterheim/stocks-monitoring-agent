@@ -1,4 +1,4 @@
-output "repository_url" {
-  description = "URL of the ECR repository"
-  value       = aws_ecr_repository.agent_repository.repository_url
+output "repository_urls" {
+  description = "Map of logical key to ECR repository URL"
+  value       = { for k, repo in aws_ecr_repository.repositories : k => repo.repository_url }
 }

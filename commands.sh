@@ -23,9 +23,7 @@ terraform -chdir=terraform plan
 
 terraform -chdir=terraform apply \
   -var-file="terraform.tfvars" \
-  -target="module.ecr" \
-  -target="module.lambda" \
-  -auto-approve
+  -target="module.ecr"
 
 # ---- Agent: Docker Build & Push ----------------------------
 
@@ -56,5 +54,12 @@ docker buildx build \
 # ---- Terraform (full apply — deploys all remaining resources) --------------
 
 terraform -chdir=terraform apply \
-  -var-file="terraform.tfvars" \
-  -auto-approve
+  -var-file="terraform.tfvars"
+
+
+PAYLOAD=$(echo -n '{"prompt": "run"}' | base64)
+aws bedrock-agentcore invoke-agent-runtime \
+  --agent-runtime-arn "arn:aws:bedrock-agentcore:us-east-1:959689756284:runtime/StocksMonitorRuntime-Qf8ct582B9" \
+  --runtime-session-id "manual-StocksMonitorRuntime-00001" \
+  --payload "$PAYLOAD" \
+  output.bin

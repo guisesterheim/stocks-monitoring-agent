@@ -4,7 +4,7 @@ WORKDIR /app
 COPY Cargo.toml ./
 COPY src ./src
 
-RUN cargo build --release
+RUN cargo build --release --target aarch64-unknown-linux-gnu
 
 FROM debian:bookworm-slim
 
