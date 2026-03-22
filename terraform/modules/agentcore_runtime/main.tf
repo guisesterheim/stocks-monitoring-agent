@@ -16,10 +16,7 @@ resource "awscc_bedrockagentcore_runtime" "stocks_monitor_runtime" {
   protocol_configuration = "HTTP"
 
   environment_variables = {
-    CLAUDE_API_KEY_SECRET_NAME    = var.claude_api_key_secret_name
     STOCKS_TABLE_NAME             = var.stocks_table_name
-    PRICES_TABLE_NAME             = var.prices_table_name
-    AGENTCORE_MEMORY_ID           = var.agentcore_memory_id
     SNS_TOPIC_ARN                 = var.sns_topic_arn
     SENDER_EMAIL_ADDRESS          = var.sender_email_address
     RECIPIENT_EMAIL_ADDRESSES     = var.recipient_email_addresses_json

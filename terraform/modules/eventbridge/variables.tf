@@ -3,7 +3,7 @@ variable "schedule_name" {
   description = "Name of the EventBridge Scheduler schedule"
 }
 
-variable "agentcore_runtime_arn" {
+variable "lambda_function_arn" {
   type        = string
-  description = "ARN of the AgentCore Runtime to invoke on schedule"
+  description = "ARN of the Lambda invoker function to trigger on schedule"
 }

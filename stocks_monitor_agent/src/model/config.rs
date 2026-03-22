@@ -3,10 +3,7 @@ use anyhow::{Context, Result};
 /// All runtime configuration loaded from environment variables at startup
 #[derive(Debug, Clone)]
 pub struct AgentConfig {
-    pub claude_api_key_secret_name: String,
     pub stocks_table_name: String,
-    pub prices_table_name: String,
-    pub agentcore_memory_id: String,
     pub sns_topic_arn: String,
     pub use_ses: bool,
     pub sender_email_address: String,
@@ -14,7 +11,7 @@ pub struct AgentConfig {
     pub daily_drop_threshold_percent: f64,
     pub weekly_drop_threshold_percent: f64,
     pub claude_model_id: String,
-    pub aws_region: String,
+    pub agentcore_browser_endpoint_url: String,
 }
 
 impl AgentConfig {
@@ -36,14 +33,8 @@ impl AgentConfig {
             .unwrap_or_default();
 
         Ok(Self {
-            claude_api_key_secret_name: std::env::var("CLAUDE_API_KEY_SECRET_NAME")
-                .context("CLAUDE_API_KEY_SECRET_NAME env var is missing")?,
             stocks_table_name: std::env::var("STOCKS_TABLE_NAME")
                 .context("STOCKS_TABLE_NAME env var is missing")?,
-            prices_table_name: std::env::var("PRICES_TABLE_NAME")
-                .context("PRICES_TABLE_NAME env var is missing")?,
-            agentcore_memory_id: std::env::var("AGENTCORE_MEMORY_ID")
-                .context("AGENTCORE_MEMORY_ID env var is missing")?,
             sns_topic_arn: std::env::var("SNS_TOPIC_ARN")
                 .context("SNS_TOPIC_ARN env var is missing")?,
             use_ses,
@@ -59,8 +50,11 @@ impl AgentConfig {
                 .context("WEEKLY_DROP_THRESHOLD_PERCENT must be a number")?,
             claude_model_id: std::env::var("CLAUDE_MODEL_ID")
                 .context("CLAUDE_MODEL_ID env var is missing")?,
-            aws_region: std::env::var("AWS_REGION_NAME")
-                .context("AWS_REGION_NAME env var is missing")?,
+            agentcore_browser_endpoint_url: {
+                let region = std::env::var("AWS_REGION_NAME")
+                    .context("AWS_REGION_NAME env var is missing")?;
+                format!("https://bedrock-agentcore.{}.amazonaws.com/browsers/aws.browser.v1", region)
+            },
         })
     }
 }

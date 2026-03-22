@@ -1,4 +1,4 @@
-FROM rust:1.82 AS builder
+FROM rust:1.91 AS builder
 
 WORKDIR /app
 COPY Cargo.toml ./
@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/
 
 WORKDIR /app
 COPY --from=builder /app/target/release/stocks_monitor_agent .
+COPY templates ./templates
 
 EXPOSE 8080
 

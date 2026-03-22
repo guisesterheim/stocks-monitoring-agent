@@ -3,9 +3,10 @@ use aws_sdk_sesv2::{
     types::{Body, Content, Destination, EmailContent, Message},
     Client as SesClient,
 };
+use aws_sdk_sns::Client as SnsClient;
 
 /// Sends an HTML email notification via AWS SES to all recipient addresses
-pub async fn send_email_alert_via_ses(
+pub async fn send_alert_via_ses(
     ses_client: &SesClient,
     sender_email_address: &str,
     recipient_email_addresses: &[String],
@@ -45,6 +46,25 @@ pub async fn send_email_alert_via_ses(
         .send()
         .await
         .context("Failed to send email via SES")?;
+
+    Ok(())
+}
+
+/// Publishes a plain-text alert message to an SNS topic
+pub async fn send_alert_via_sns(
+    sns_client: &SnsClient,
+    sns_topic_arn: &str,
+    subject: &str,
+    message_body: &str,
+) -> Result<()> {
+    sns_client
+        .publish()
+        .topic_arn(sns_topic_arn)
+        .subject(subject)
+        .message(message_body)
+        .send()
+        .await
+        .context("Failed to publish alert to SNS")?;
 
     Ok(())
 }

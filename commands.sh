@@ -3,6 +3,7 @@
 # ============================================================
 # Pipeline Commands
 # ============================================================
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>/dev/null)
 
 # ---- CloudFormation ----------------------------------------
 
@@ -12,33 +13,48 @@ aws cloudformation deploy \
   --stack-name terraform-state-bootstrap \
   --parameter-overrides BucketName="${AWS_ACCOUNT_ID}-stocks-monitor-state-files"
 
-# ---- Terraform (first apply — creates ECR before building image) -----------
+# ---- Terraform (first apply — creates ECR repos before building images) ----
 
 terraform -chdir=terraform init \
   -backend-config="bucket=${AWS_ACCOUNT_ID}-stocks-monitor-state-files" \
   -backend-config="region=us-east-1"
 
+terraform -chdir=terraform plan
+
 terraform -chdir=terraform apply \
   -var-file="terraform.tfvars" \
   -target="module.ecr" \
+  -target="module.lambda" \
   -auto-approve
 
-# ---- Docker Build & Push -----------------------------------
+# ---- Agent: Docker Build & Push ----------------------------
 
-ECR_REPOSITORY_URL=$(terraform -chdir=terraform output -raw ecr_repository_url)
+ECR_AGENT_URL=$(terraform -chdir=terraform output -raw ecr_repository_url)
 
 aws ecr get-login-password --region us-east-1 \
-  | docker login --username AWS --password-stdin "$ECR_REPOSITORY_URL"
+  | docker login --username AWS --password-stdin "$ECR_AGENT_URL"
 
-docker build -t stocks-monitor-agent stocks_monitor_agent/
+docker buildx build \
+  --platform linux/arm64 \
+  --provenance=false \
+  --output type=image,name="${ECR_AGENT_URL}:latest",push=true \
+  stocks_monitor_agent/
 
-docker tag stocks-monitor-agent:latest "${ECR_REPOSITORY_URL}:latest"
+# ---- Lambda Invoker: Docker Build & Push -------------------
 
-docker push "${ECR_REPOSITORY_URL}:latest"
+ECR_LAMBDA_URL=$(terraform -chdir=terraform output -raw lambda_invoker_ecr_repository_url)
+
+aws ecr get-login-password --region us-east-1 \
+  | docker login --username AWS --password-stdin "$ECR_LAMBDA_URL"
+
+docker buildx build \
+  --platform linux/arm64 \
+  --provenance=false \
+  --output type=image,name="${ECR_LAMBDA_URL}:latest",push=true \
+  lambda_invoker/
 
 # ---- Terraform (full apply — deploys all remaining resources) --------------
 
 terraform -chdir=terraform apply \
   -var-file="terraform.tfvars" \
-  -var="container_image_uri=${ECR_REPOSITORY_URL}:latest" \
   -auto-approve

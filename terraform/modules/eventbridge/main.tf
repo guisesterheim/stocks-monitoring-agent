@@ -6,12 +6,12 @@ resource "aws_scheduler_schedule" "daily_stock_monitor_trigger" {
     mode = "OFF"
   }
 
-  # 3:30 PM EST = 20:30 UTC
-  schedule_expression          = "cron(30 20 * * ? *)"
+  # 3:30 PM EST — EventBridge Scheduler cron format: (minutes hours day-of-month month day-of-week year)
+  schedule_expression          = "cron(30 15 * * ? *)"
   schedule_expression_timezone = "America/New_York"
 
   target {
-    arn      = var.agentcore_runtime_arn
+    arn      = var.lambda_function_arn
     role_arn = aws_iam_role.scheduler_role.arn
 
     input = jsonencode({
@@ -41,8 +41,16 @@ resource "aws_iam_role_policy" "scheduler_invoke_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect   = "Allow"
-      Action   = ["bedrock-agentcore:InvokeAgentRuntime"]
-      Resource = [var.agentcore_runtime_arn]
+      Action   = ["lambda:InvokeFunction"]
+      Resource = [var.lambda_function_arn]
     }]
   })
+}
+
+resource "aws_lambda_permission" "allow_scheduler" {
+  statement_id  = "AllowEventBridgeScheduler"
+  action        = "lambda:InvokeFunction"
+  function_name = var.lambda_function_arn
+  principal     = "scheduler.amazonaws.com"
+  source_arn    = aws_scheduler_schedule.daily_stock_monitor_trigger.arn
 }

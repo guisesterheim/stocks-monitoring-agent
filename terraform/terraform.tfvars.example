@@ -1,39 +1,33 @@
 # Copy this file to terraform.tfvars and fill in the values
 # Never commit terraform.tfvars to version control
 
-terraform_state_bucket_name = "<aws-account-id>-stocks-monitor-state-files"
-claude_api_key_secret_name  = "stocks-monitor/claude-api-key"
-ecr_repository_name         = "stocks-monitor-agent"
-stocks_table_name           = "stocks-monitor-stocks-list"
-prices_table_name           = "stocks-monitor-prices-history"
-sns_topic_name              = "stocks-monitor-alerts"
-
-# SES notification (optional) — leave empty to use SNS only.
-# If provided, SES will be used instead of SNS.
-# The SES identity must already be verified (managed by another repo).
-ses_sender_email_address    = "stocks-agent@sesterheim.com.br"
-agentcore_memory_name       = "StocksMonitorMemory"
-memory_event_expiry_days    = 10
-iam_role_name               = "stocks-monitor-agentcore-role"
-agentcore_runtime_name      = "StocksMonitorRuntime"
-eventbridge_schedule_name   = "stocks-monitor-daily-trigger"
-claude_model_id             = "amazon.nova-micro-v1:0"
+ecr_repository_name        = "stocks-monitor-agent"
+stocks_table_name          = "stocks-monitor-stocks-list"
+sns_topic_name             = "stocks-monitor-alerts"
+iam_role_name              = "stocks-monitor-agentcore-role"
+agentcore_runtime_name     = "StocksMonitorRuntime"
+eventbridge_schedule_name  = "stocks-monitor-daily-trigger"
+claude_model_id            = "amazon.nova-micro-v1:0"
 daily_drop_threshold_percent  = 2
 weekly_drop_threshold_percent = 5
 
-# Set this after building and pushing the container image
+# Set after building and pushing the agent container image
 container_image_uri = "<aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:latest"
+
+# Lambda invoker
+lambda_invoker_ecr_repository_name = "stocks-monitor-lambda-invoker"
+lambda_invoker_role_name           = "stocks-monitor-lambda-invoker-role"
+lambda_invoker_function_name       = "stocks-monitor-lambda-invoker"
+
+# Set after building and pushing the Lambda invoker container image
+lambda_invoker_image_uri = "<aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-lambda-invoker:latest"
 
 recipient_email_addresses = [
   "<recipient-email-1>",
   "<recipient-email-2>"
 ]
 
-# Stocks and indexes to monitor — loaded into DynamoDB on first run
-# Format: ticker symbol as used on CNBC
-stocks_to_monitor = [
-  "NASDAQ",
-  "SP500",
-  "SCHD",
-  "VICI"
-]
+# SES notification (optional) — leave empty or remove to use SNS only.
+# If provided, SES will be used instead of SNS.
+# The SES identity must already be verified (managed by another repo).
+# ses_sender_email_address = "stocks-agent@sesterheim.com.br"

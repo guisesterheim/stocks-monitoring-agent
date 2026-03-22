@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stocks Monitor Alert</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 24px;
+      margin: 0;
+    }
+    h1 {
+      color: #333;
+      font-size: 20px;
+      margin-bottom: 24px;
+    }
+    .tiles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .tile {
+      border-radius: 8px;
+      padding: 20px 24px;
+      min-width: 200px;
+      color: #ffffff;
+    }
+    .tile.up   { background-color: #2e7d32; }
+    .tile.down { background-color: #c62828; }
+    .tile .ticker  { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
+    .tile .price   { font-size: 18px; margin-bottom: 12px; }
+    .tile .change  { font-size: 14px; margin-bottom: 4px; }
+    .tile a        { color: #ffffff; font-size: 13px; opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <h1>Stocks Monitor Alert</h1>
+  <div class="tiles">
+    {{STOCK_TILES}}
+  </div>
+</body>
+</html>

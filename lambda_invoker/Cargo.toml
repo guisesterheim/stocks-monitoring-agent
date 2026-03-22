@@ -1,32 +1,26 @@
 [package]
-name = "stocks_monitor_agent"
+name = "lambda_invoker"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "stocks_monitor_agent"
+name = "bootstrap"
 path = "src/main.rs"
 
 [dependencies]
-# HTTP server (AgentCore Runtime expects an HTTP endpoint)
-axum = "0.7"
+# Lambda runtime
+lambda_runtime = "0.13"
+
+# AWS SDK for AgentCore data plane
+aws-config = "1"
+aws-sdk-bedrockagentcore = "1"
 
 # Async runtime
 tokio = { version = "1", features = ["full"] }
 
-# HTTP client for AgentCore Browser calls
-reqwest = { version = "0.12", features = ["json"] }
-
 # Serialization
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
-# AWS SDKs
-aws-config = "1"
-aws-sdk-bedrockruntime = "1"
-aws-sdk-sesv2 = "1"
-aws-sdk-dynamodb = "1"
-aws-sdk-sns = "1"
 
 # Error handling
 anyhow = "1"

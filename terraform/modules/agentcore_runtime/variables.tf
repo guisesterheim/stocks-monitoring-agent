@@ -13,24 +13,9 @@ variable "container_image_uri" {
   description = "Full URI of the container image in ECR (including tag)"
 }
 
-variable "claude_api_key_secret_name" {
-  type        = string
-  description = "Name of the Secrets Manager secret containing the Claude API key"
-}
-
 variable "stocks_table_name" {
   type        = string
   description = "Name of the DynamoDB table storing the monitored stocks list"
-}
-
-variable "prices_table_name" {
-  type        = string
-  description = "Name of the DynamoDB table storing historical closing prices"
-}
-
-variable "agentcore_memory_id" {
-  type        = string
-  description = "ID of the AgentCore Memory resource"
 }
 
 variable "sns_topic_arn" {
