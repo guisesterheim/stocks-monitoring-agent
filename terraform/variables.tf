@@ -3,6 +3,12 @@ variable "ecr_repository_name" {
   description = "Name of the ECR repository for the agent container image"
 }
 
+variable "monitored_tickers" {
+  type        = list(string)
+  description = "List of ticker symbols to seed into the monitored stocks DynamoDB table"
+  default     = []
+}
+
 variable "stocks_table_name" {
   type        = string
   description = "Name of the DynamoDB table storing the monitored stocks list"
@@ -79,6 +85,11 @@ variable "lambda_invoker_image_uri" {
 variable "eventbridge_schedule_name" {
   type        = string
   description = "Name of the EventBridge Scheduler schedule"
+}
+
+variable "cloudwatch_log_group_name" {
+  type        = string
+  description = "Name of the CloudWatch log group the agent writes diagnostic logs to"
 }
 
 variable "log_retention_days" {

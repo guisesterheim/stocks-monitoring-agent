@@ -3,6 +3,14 @@
 
 ecr_repository_name        = "stocks-monitor-agent"
 stocks_table_name          = "stocks-monitor-stocks-list"
+
+monitored_tickers = [
+  ".IXIC",   # NASDAQ Composite
+  ".SPX",    # S&P 500
+  "AMZN",    # Amazon Web Services
+  "SCHD"    # Schwab US Dividend Equity ETF
+]
+
 sns_topic_name             = "stocks-monitor-alerts"
 iam_role_name              = "stocks-monitor-agentcore-role"
 agentcore_runtime_name     = "StocksMonitorRuntime"
@@ -31,6 +39,9 @@ recipient_email_addresses = [
 # If provided, SES will be used instead of SNS.
 # The SES identity must already be verified (managed by another repo).
 # ses_sender_email_address = "<sender-email>"
+
+# CloudWatch log group for IAM permission scoping (AgentCore auto-created log group name)
+# cloudwatch_log_group_name = "/aws/bedrock-agentcore/runtimes/<runtime-id>-DEFAULT"
 
 # CloudWatch log retention (days)
 log_retention_days = 7

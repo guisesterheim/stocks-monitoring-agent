@@ -1,4 +1,4 @@
-use anyhow::{Result};
+use anyhow::Result;
 use axum::http::StatusCode;
 use axum::Json;
 use serde_json::{json, Value};
@@ -33,17 +33,17 @@ pub async fn handle_invocation(
 async fn run_stocks_monitor_pipeline() -> Result<()> {
     let config = AgentConfig::load_from_environment()?;
 
-    let aws_sdk_config = aws_config::defaults(aws_config::BehaviorVersion::latest()).load().await;
+    let aws_sdk_config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+        .region(aws_config::meta::region::RegionProviderChain::first_try(
+            aws_sdk_sns::config::Region::new(config.aws_region.clone()),
+        ))
+        .load()
+        .await;
     let dynamodb_client = aws_sdk_dynamodb::Client::new(&aws_sdk_config);
     let bedrock_client = aws_sdk_bedrockruntime::Client::new(&aws_sdk_config);
     let ses_client = aws_sdk_sesv2::Client::new(&aws_sdk_config);
     let sns_client = aws_sdk_sns::Client::new(&aws_sdk_config);
     let http_client = reqwest::Client::new();
-
-    let browser_endpoint_url = config.agentcore_browser_endpoint_url.clone();
-
-    // TODO: remove — debug probe to confirm execution started
-    send_diagnostic_notification(&config, &ses_client, &sns_client, "start").await?;
 
     let monitored_stocks = dynamodb_repository::fetch_monitored_stocks(
         &dynamodb_client,
@@ -59,7 +59,7 @@ async fn run_stocks_monitor_pipeline() -> Result<()> {
         let market_data = browser_repository::fetch_stock_market_data_from_cnbc(
             &http_client,
             &bedrock_client,
-            &browser_endpoint_url,
+            &config.agentcore_browser_endpoint_url,
             &config.claude_model_id,
             &stock.ticker,
         )
@@ -84,15 +84,10 @@ async fn run_stocks_monitor_pipeline() -> Result<()> {
 
     if triggered_alerts.is_empty() {
         info!("No alerts triggered for this run");
-        // TODO: remove — debug probe to confirm execution completed
-        send_diagnostic_notification(&config, &ses_client, &sns_client, "end").await?;
         return Ok(());
     }
 
     send_notifications(&config, &ses_client, &sns_client, &triggered_alerts).await?;
-
-    // TODO: remove — debug probe to confirm execution completed
-    send_diagnostic_notification(&config, &ses_client, &sns_client, "end").await?;
 
     Ok(())
 }
@@ -131,42 +126,9 @@ async fn send_notifications(
     Ok(())
 }
 
-/// TODO: remove — sends a diagnostic ping ("start" or "end") to confirm execution
-async fn send_diagnostic_notification(
-    config: &AgentConfig,
-    ses_client: &aws_sdk_sesv2::Client,
-    sns_client: &aws_sdk_sns::Client,
-    label: &str,
-) -> Result<()> {
-    let subject = format!("Stocks Monitor Agent — {}", label);
-    let body = format!("Agent execution: {}", label);
-
-    if config.use_ses {
-        notification_repository::send_alert_via_ses(
-            ses_client,
-            &config.sender_email_address,
-            &config.recipient_email_addresses,
-            &subject,
-            &body,
-        )
-        .await?;
-    } else {
-        notification_repository::send_alert_via_sns(
-            sns_client,
-            &config.sns_topic_arn,
-            &subject,
-            &body,
-        )
-        .await?;
-    }
-
-    info!("Diagnostic notification sent: {}", label);
-    Ok(())
-}
-
 /// Builds a plain-text message body for SNS notifications
 fn build_sns_plain_text_message(alerts: &[StockAlertEvaluation]) -> String {
-    let lines: Vec<String> = alerts
+    alerts
         .iter()
         .map(|alert| {
             format!(
@@ -179,7 +141,6 @@ fn build_sns_plain_text_message(alerts: &[StockAlertEvaluation]) -> String {
                 alert.ticker,
             )
         })
-        .collect();
-
-    lines.join("\n")
+        .collect::<Vec<_>>()
+        .join("\n")
 }

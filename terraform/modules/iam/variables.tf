@@ -12,3 +12,13 @@ variable "sns_topic_arn" {
   type        = string
   description = "ARN of the SNS topic for stock alert notifications"
 }
+
+variable "aws_account_id" {
+  type        = string
+  description = "AWS account ID — used to scope IAM trust policy and CloudWatch log permissions"
+}
+
+variable "agentcore_runtime_log_group_arn" {
+  type        = string
+  description = "ARN of the AgentCore Runtime CloudWatch log group (used to scope log permissions)"
+}

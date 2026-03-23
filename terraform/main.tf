@@ -1,3 +1,9 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_cloudwatch_log_group" "agentcore_runtime" {
+  name = var.cloudwatch_log_group_name
+}
+
 module "ecr" {
   source = "./modules/ecr"
   repository_names = {
@@ -9,6 +15,7 @@ module "ecr" {
 module "dynamodb" {
   source            = "./modules/dynamodb"
   stocks_table_name = var.stocks_table_name
+  monitored_tickers = var.monitored_tickers
 }
 
 module "sns" {
@@ -24,10 +31,12 @@ module "cloudwatch_logs" {
 }
 
 module "iam" {
-  source           = "./modules/iam"
-  role_name        = var.iam_role_name
-  stocks_table_arn = module.dynamodb.stocks_table_arn
-  sns_topic_arn    = module.sns.topic_arn
+  source                          = "./modules/iam"
+  role_name                       = var.iam_role_name
+  stocks_table_arn                = module.dynamodb.stocks_table_arn
+  sns_topic_arn                   = module.sns.topic_arn
+  aws_account_id                  = data.aws_caller_identity.current.account_id
+  agentcore_runtime_log_group_arn = data.aws_cloudwatch_log_group.agentcore_runtime.arn
 }
 
 module "agentcore_runtime" {

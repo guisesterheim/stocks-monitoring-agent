@@ -48,5 +48,3 @@ variable "claude_model_id" {
   type        = string
   description = "Bedrock model ID for Claude (e.g. amazon.nova-micro-v1:0)"
 }
-
-

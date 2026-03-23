@@ -56,20 +56,47 @@ resource "aws_iam_role_policy" "agentcore_runtime_policy" {
         Resource = ["*"]
       },
       {
-        Sid      = "AllowBedrockModelInvocation"
-        Effect   = "Allow"
-        Action   = ["bedrock:InvokeModel"]
+        Sid    = "AllowBedrockModelInvocation"
+        Effect = "Allow"
+        Action = [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+        ]
         Resource = ["*"]
       },
       {
-        Sid    = "AllowCloudWatchLogs"
+        Sid    = "AllowCloudWatchLogsGroupAccess"
         Effect = "Allow"
         Action = [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = ["arn:aws:logs:us-east-1:*:*"]
+        Resource = ["arn:aws:logs:us-east-1:${var.aws_account_id}:log-group:*"]
+      },
+      {
+        Sid    = "AllowXRayTracing"
+        Effect = "Allow"
+        Action = [
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets"
+        ]
+        Resource = ["*"]
+      },
+      {
+        Sid    = "AllowCloudWatchMetrics"
+        Effect = "Allow"
+        Action = ["cloudwatch:PutMetricData"]
+        Resource = ["*"]
+        Condition = {
+          StringEquals = {
+            "cloudwatch:namespace" = "bedrock-agentcore"
+          }
+        }
       }
     ]
   })

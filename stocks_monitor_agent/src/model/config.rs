@@ -3,6 +3,7 @@ use anyhow::{Context, Result};
 /// All runtime configuration loaded from environment variables at startup
 #[derive(Debug, Clone)]
 pub struct AgentConfig {
+    pub aws_region: String,
     pub stocks_table_name: String,
     pub sns_topic_arn: String,
     pub use_ses: bool,
@@ -32,7 +33,11 @@ impl AgentConfig {
         let sender_email_address = std::env::var("SENDER_EMAIL_ADDRESS")
             .unwrap_or_default();
 
+        let region = std::env::var("AWS_REGION_NAME")
+            .context("AWS_REGION_NAME env var is missing")?;
+
         Ok(Self {
+            aws_region: region.clone(),
             stocks_table_name: std::env::var("STOCKS_TABLE_NAME")
                 .context("STOCKS_TABLE_NAME env var is missing")?,
             sns_topic_arn: std::env::var("SNS_TOPIC_ARN")
@@ -50,11 +55,10 @@ impl AgentConfig {
                 .context("WEEKLY_DROP_THRESHOLD_PERCENT must be a number")?,
             claude_model_id: std::env::var("CLAUDE_MODEL_ID")
                 .context("CLAUDE_MODEL_ID env var is missing")?,
-            agentcore_browser_endpoint_url: {
-                let region = std::env::var("AWS_REGION_NAME")
-                    .context("AWS_REGION_NAME env var is missing")?;
-                format!("https://bedrock-agentcore.{}.amazonaws.com/browsers/aws.browser.v1", region)
-            },
+            agentcore_browser_endpoint_url: format!(
+                "https://bedrock-agentcore.{}.amazonaws.com/browsers/aws.browser.v1",
+                region
+            ),
         })
     }
 }
