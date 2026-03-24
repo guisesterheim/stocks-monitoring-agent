@@ -3,4 +3,8 @@ resource "aws_cloudwatch_log_group" "existing" {
 
   name              = each.value
   retention_in_days = var.log_retention_days
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }

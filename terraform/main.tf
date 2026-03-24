@@ -1,9 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_cloudwatch_log_group" "agentcore_runtime" {
-  name = var.cloudwatch_log_group_name
-}
-
 module "ecr" {
   source = "./modules/ecr"
   repository_names = {
@@ -24,19 +20,18 @@ module "sns" {
   recipient_email_addresses = var.recipient_email_addresses
 }
 
-module "cloudwatch_logs" {
-  source                   = "./modules/cloudwatch_logs"
-  log_retention_days       = var.log_retention_days
-  existing_log_group_names = var.existing_log_group_names
-}
-
 module "iam" {
   source                          = "./modules/iam"
   role_name                       = var.iam_role_name
   stocks_table_arn                = module.dynamodb.stocks_table_arn
   sns_topic_arn                   = module.sns.topic_arn
   aws_account_id                  = data.aws_caller_identity.current.account_id
-  agentcore_runtime_log_group_arn = data.aws_cloudwatch_log_group.agentcore_runtime.arn
+}
+
+module "security_group" {
+  source              = "./modules/security_group"
+  security_group_name = var.agentcore_security_group_name
+  vpc_id              = var.vpc_id
 }
 
 module "agentcore_runtime" {
@@ -51,6 +46,8 @@ module "agentcore_runtime" {
   daily_drop_threshold_percent   = var.daily_drop_threshold_percent
   weekly_drop_threshold_percent  = var.weekly_drop_threshold_percent
   claude_model_id                = var.claude_model_id
+  subnet_ids                     = var.agentcore_subnet_ids
+  security_group_ids             = [module.security_group.security_group_id]
 }
 
 module "lambda" {
@@ -65,4 +62,12 @@ module "eventbridge" {
   source              = "./modules/eventbridge"
   schedule_name       = var.eventbridge_schedule_name
   lambda_function_arn = module.lambda.function_arn
+}
+
+module "cloudwatch_logs" {
+  source                   = "./modules/cloudwatch_logs"
+  log_retention_days       = var.log_retention_days
+  existing_log_group_names = var.existing_log_group_names
+
+  depends_on = [ module.agentcore_runtime ]
 }

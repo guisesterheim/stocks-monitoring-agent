@@ -10,7 +10,11 @@ resource "awscc_bedrockagentcore_runtime" "stocks_monitor_runtime" {
   }
 
   network_configuration = {
-    network_mode = "PUBLIC"
+    network_mode = "VPC"
+    network_mode_config = {
+      subnets         = var.subnet_ids
+      security_groups = var.security_group_ids
+    }
   }
 
   protocol_configuration = "HTTP"
@@ -25,8 +29,5 @@ resource "awscc_bedrockagentcore_runtime" "stocks_monitor_runtime" {
     CLAUDE_MODEL_ID               = var.claude_model_id
     AWS_REGION_NAME               = "us-east-1"
     USE_SES                       = var.sender_email_address != "" ? "true" : "false"
-    RUST_LOG                      = "info"
   }
 }
-
-

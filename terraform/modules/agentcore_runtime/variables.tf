@@ -48,3 +48,13 @@ variable "claude_model_id" {
   type        = string
   description = "Bedrock model ID for Claude (e.g. amazon.nova-micro-v1:0)"
 }
+
+variable "subnet_ids" {
+  type        = list(string)
+  description = "List of private subnet IDs for the AgentCore Runtime VPC configuration"
+}
+
+variable "security_group_ids" {
+  type        = list(string)
+  description = "List of security group IDs for the AgentCore Runtime VPC configuration"
+}

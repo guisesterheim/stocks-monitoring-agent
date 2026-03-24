@@ -103,3 +103,18 @@ variable "existing_log_group_names" {
   description = "List of existing CloudWatch log group names to manage retention on (e.g. Lambda log groups)"
   default     = []
 }
+
+variable "agentcore_subnet_ids" {
+  type        = list(string)
+  description = "List of private subnet IDs for the AgentCore Runtime VPC configuration"
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "ID of the VPC where the AgentCore Runtime security group will be created"
+}
+
+variable "agentcore_security_group_name" {
+  type        = string
+  description = "Name of the security group to create for the AgentCore Runtime"
+}

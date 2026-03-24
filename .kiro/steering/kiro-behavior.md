@@ -11,3 +11,8 @@
 - If Kiro is unsure about any requirement, design decision, or missing value, it must stop and ask the user before proceeding
 - Kiro must not fill gaps with guesses or placeholder logic and move on
 - A clear question to the user is always preferred over a wrong assumption
+
+## Never expose any AWS service publicly
+
+- For every AWS resource created, never expose it publicly unless explicitly requested
+- This is applicable to S3 bucket files, endpoints, agentcore runtime, lambda functions, etc

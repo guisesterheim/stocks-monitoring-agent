@@ -4,8 +4,8 @@ Goal: monitor and notify registered emails about stock market moves over a certa
 
 ## Architecture
 
-- AWS AgentCore Runtime runs a Rust-based AI agent as a container (HTTP server on port 8080)
-- AgentCore Browser fetches CNBC pages for stock data
+- AWS AgentCore Runtime runs a Python-based AI agent as a container (HTTP server on port 8080)
+- AgentCore Browser fetches CNBC pages for stock data via Playwright over CDP
 - Claude via Bedrock (IAM auth) analyzes the scraped data on every invocation
 - Notifications are sent via SNS (default) or AWS SES (when sender email is configured)
 - Infrastructure is managed with Terraform, bootstrap bucket via CloudFormation
@@ -17,63 +17,50 @@ Goal: monitor and notify registered emails about stock market moves over a certa
 
 ## Technology Stack
 
-- Language: Rust (AgentCore Runtime HTTP handler — axum on port 8080)
+- Language: Python 3.12 (AgentCore Runtime HTTP handler — FastAPI/uvicorn on port 8080)
 - AI: Claude via AWS Bedrock (IAM auth, no API key needed)
-- Data source: CNBC via AgentCore Browser on each invocation
+- Data source: CNBC via AgentCore Browser (aws.browser.v1) + Playwright on each invocation
 - Infrastructure: Terraform + CloudFormation (bootstrap only)
 - Notifications: SNS (default) or SES (optional, when `ses_sender_email_address` is set)
-- State backend: Terraform state stored in S3 (bootstrap bucket created via CloudFormation)
+- State backend: Terraform state stored in S3 (bucket bootstrapped via CloudFormation)
 - Secrets: none — all config passed via environment variables from AgentCore Runtime
 
-## Rust Conventions
-
-Since this project targets developers new to Rust, follow these guidelines:
+## Python Conventions
 
 ### Error Handling
-- Use `anyhow` for application-level errors (simple, ergonomic)
-- Always propagate errors with `?` rather than `.unwrap()` or `.expect()` except in tests
-- Avoid `panic!` in production code paths
+- Raise exceptions with descriptive messages; let FastAPI catch unhandled exceptions and return 500
+- Never silently swallow exceptions — always log before re-raising or returning an error response
+- Avoid bare `except:` clauses; catch specific exception types
 
-### Async
-- Use `tokio` as the async runtime
-- Use `async/await` throughout; avoid blocking calls inside async functions
-- HTTP server uses `axum` listening on port 8080
-
-### Dependencies (preferred crates)
-- `tokio` — async runtime
-- `axum` — HTTP server (AgentCore Runtime protocol)
-- `serde` / `serde_json` — serialization
-- `reqwest` — HTTP client (for AgentCore Browser calls)
-- `aws-sdk-bedrockruntime` — Claude via Bedrock
-- `aws-sdk-sesv2` — sending emails via SES
-- `aws-sdk-dynamodb` — reading monitored stocks list
-- `aws-sdk-sns` — SNS notifications
-- `aws-config` — AWS SDK configuration
-- `anyhow` — error handling
-- `tracing` / `tracing-subscriber` — structured logging
+### Dependencies (preferred packages)
+- `fastapi` — HTTP server (AgentCore Runtime protocol)
+- `uvicorn[standard]` — ASGI server
+- `boto3` — AWS SDK (DynamoDB, Bedrock, SES, SNS)
+- `bedrock-agentcore` — AgentCore Browser client (`BrowserClient`)
+- `playwright` — browser automation over CDP
 
 ### Code Style
-- Prefer explicit types over relying on inference when it aids readability
-- Use `snake_case` for variables and functions, `PascalCase` for types and structs
+- Use `snake_case` for variables and functions, `PascalCase` for classes
 - Keep functions small and single-purpose
-- Document public functions and structs with `///` doc comments
+- Document public functions and classes with docstrings
 - Avoid deeply nested code; extract logic into named functions
+- Use type hints throughout
 
 ## Code Organization
 
-Use the following folder structure under `src/`:
+Use the following folder structure under `app/`:
 
 ```
-src/
-  main.rs          # Axum HTTP server entrypoint, minimal logic
+app/
+  main.py          # FastAPI server entrypoint, /invocations + /ping, minimal logic
   controller/      # Request handling, orchestration logic
   model/           # Data structures, domain types
-  repository/      # External I/O: HTTP calls, AWS SDK calls
+  repository/      # External I/O: AWS SDK calls, browser calls
 ```
 
 ### Rules
 1. Aim for simplicity — if it's hard to read, simplify it
-2. No Rust file can exceed 200 lines
+2. No Python file can exceed 200 lines
 3. No folder can contain more than 10 files
 4. Use clear, verbose naming — prefer `fetch_stock_market_data_from_cnbc` over `fetch`
 5. Separate files by general responsibility, matching the folder structure above

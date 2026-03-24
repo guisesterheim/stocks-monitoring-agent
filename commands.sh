@@ -74,6 +74,7 @@ aws bedrock-agentcore invoke-agent-runtime \
 # In a separate terminal, invoke with:
 #   curl -X POST http://localhost:8080/invocations -H "Content-Type: application/json" -d '{"prompt":"run"}'
 
+ECR_AGENT_URL=$(terraform -chdir=terraform output -raw ecr_repository_url)
 SNS_TOPIC_ARN=$(terraform -chdir=terraform output -raw sns_topic_arn)
 AWS_CREDENTIALS_CACHE_DIR="/Users/guisester/.aws/login/cache"
 AWS_CREDENTIALS_FILE=$(ls "$AWS_CREDENTIALS_CACHE_DIR"/*.json 2>/dev/null | head -n 1)
@@ -87,7 +88,6 @@ docker run -p 8080:8080 \
   -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
   -e AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN}" \
   -e AWS_DEFAULT_REGION="us-east-1" \
-  -e RUST_LOG="info" \
   -e RECIPIENT_EMAIL_ADDRESSES="[\"exmokvra@gmail.com\"]" \
   -e AWS_REGION_NAME="us-east-1" \
   -e CLAUDE_MODEL_ID="amazon.nova-micro-v1:0" \
@@ -98,3 +98,5 @@ docker run -p 8080:8080 \
   -e USE_SES="true" \
   -e WEEKLY_DROP_THRESHOLD_PERCENT="5" \
   "${ECR_AGENT_URL}:latest"
+
+curl -X POST http://localhost:8080/invocations -H "Content-Type: application/json" -d '{"prompt":"run"}'

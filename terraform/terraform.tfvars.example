@@ -50,3 +50,12 @@ log_retention_days = 7
 existing_log_group_names = [
   "/aws/lambda/<your-lambda-function-name>"
 ]
+
+# VPC configuration for AgentCore Runtime (private networking)
+agentcore_subnet_ids = [
+  "<subnet-id-1>",
+  "<subnet-id-2>"
+]
+
+vpc_id                        = "<vpc-id>"
+agentcore_security_group_name = "stocks-monitor-agentcore-sg"
