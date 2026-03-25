@@ -35,6 +35,7 @@ def run_stocks_monitor_pipeline() -> None:
     )
     logger.info("Monitoring %d stocks", len(monitored_stocks))
 
+    all_evaluations: list[StockAlertEvaluation] = []
     triggered_alerts: list[StockAlertEvaluation] = []
 
     for stock in monitored_stocks:
@@ -44,12 +45,14 @@ def run_stocks_monitor_pipeline() -> None:
             claude_model_id=config.claude_model_id,
             ticker=stock.ticker,
         )
-        
+
         alert = evaluate_stock_alerts(
             market_data,
             config.daily_drop_threshold_percent,
             config.weekly_drop_threshold_percent,
         )
+
+        all_evaluations.append(alert)
 
         if alert.daily_alert_triggered or alert.weekly_alert_triggered:
             logger.info(
@@ -60,24 +63,22 @@ def run_stocks_monitor_pipeline() -> None:
             )
             triggered_alerts.append(alert)
 
-    if not triggered_alerts:
-        logger.info("No alerts triggered for this run")
-        return
-
-    _send_notifications(config, ses_client, sns_client, triggered_alerts)
+    logger.info("%d of %d stocks triggered alerts", len(triggered_alerts), len(all_evaluations))
+    _send_notifications(config, ses_client, sns_client, all_evaluations, triggered_alerts)
 
 
 def _send_notifications(
     config: AgentConfig,
     ses_client,
     sns_client,
+    all_evaluations: list[StockAlertEvaluation],
     triggered_alerts: list[StockAlertEvaluation],
 ) -> None:
-    """Sends notifications for all triggered alerts via SES or SNS based on config."""
-    subject = f"Stock Alert: {len(triggered_alerts)} ticker(s) triggered"
+    """Sends daily report with all stocks. Triggered alerts are highlighted."""
+    subject = f"Stock Monitor Daily Report: {len(triggered_alerts)} ticker(s) triggered"
 
     if config.use_ses:
-        body_html = _build_alert_email_html(triggered_alerts)
+        body_html = _build_alert_email_html(all_evaluations)
         notification_repository.send_alert_via_ses(
             ses_client,
             config.sender_email_address,
@@ -86,7 +87,7 @@ def _send_notifications(
             body_html,
         )
     else:
-        message_body = _build_sns_plain_text_message(triggered_alerts)
+        message_body = _build_sns_plain_text_message(all_evaluations)
         notification_repository.send_alert_via_sns(
             sns_client,
             config.sns_topic_arn,
@@ -94,17 +95,19 @@ def _send_notifications(
             message_body,
         )
 
-    logger.info("Notifications sent for %d alert(s)", len(triggered_alerts))
+    logger.info("Notifications sent for %d stock(s)", len(all_evaluations))
 
 
 def _build_alert_email_html(alerts: list[StockAlertEvaluation]) -> str:
-    """Loads the HTML email template and injects the stock tiles."""
+    """Loads the HTML email template and injects the stock tiles and timestamp."""
+    from datetime import datetime, timezone
     template_path = os.environ.get("EMAIL_TEMPLATE_PATH", "/app/templates/alert_email.html")
     with open(template_path, "r", encoding="utf-8") as f:
         template = f.read()
 
+    timestamp = datetime.now(timezone.utc).strftime("%B %d, %Y %H:%M UTC")
     tiles = "".join(_build_stock_tile_html(alert) for alert in alerts)
-    return template.replace("{{STOCK_TILES}}", tiles)
+    return template.replace("{{STOCK_TILES}}", tiles).replace("{{TIMESTAMP}}", timestamp)
 
 
 def _build_stock_tile_html(alert: StockAlertEvaluation) -> str:

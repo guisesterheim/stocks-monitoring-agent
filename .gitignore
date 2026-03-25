@@ -36,6 +36,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-target
-
 authenticate.sh
+output.bin

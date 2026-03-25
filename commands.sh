@@ -27,7 +27,7 @@ terraform -chdir=terraform apply \
 
 # ---- Agent: Docker Build & Push ----------------------------
 
-VERSION="8"
+VERSION="17"
 ECR_AGENT_URL=$(terraform -chdir=terraform output -raw ecr_repository_url)
 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$ECR_AGENT_URL"
@@ -39,7 +39,7 @@ docker buildx build \
   stocks_monitor_agent/
 
 terraform -chdir=terraform apply \
-  -var="container_image_uri=959689756284.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:v${VERSION}" \
+  -var="container_image_uri=${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:v${VERSION}" \
   -var-file="terraform.tfvars"
 
 
@@ -60,7 +60,7 @@ docker buildx build \
 # ---- Terraform (full apply — deploys all remaining resources) --------------
 
 terraform -chdir=terraform apply \
-  -var="container_image_uri=959689756284.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:v${VERSION}" \
+  -var="container_image_uri=${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:v${VERSION}" \
   -var-file="terraform.tfvars"
 
 

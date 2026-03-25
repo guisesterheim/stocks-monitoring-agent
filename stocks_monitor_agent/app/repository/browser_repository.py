@@ -35,14 +35,13 @@ def browse_cnbc_quote_page(aws_region: str, ticker: str) -> str:
             page = context.pages[0] if context.pages else context.new_page()
 
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
-
-            # TODO: test more targeted navigation (commented out for initial testing)
-            # page.get_by_role("button", name="Search quotes, news & videos").click()
-            # search_box = page.locator(".SearchEntry-suggestNotActiveInput.SearchEntry-searchInput.SearchEntry-query")
-            # search_box.fill(ticker)
-            # search_box.press("Enter")
-            # page.wait_for_selector(".QuoteStrip-lastPriceStripContainer", timeout=5000)
-
+            try:
+                page.wait_for_selector("text=5 Day", timeout=15000)
+            except Exception:
+                logger.warning(
+                    "RETURNS section did not load in time for ticker '%s' — "
+                    "five_day and thirty_day change will default to 0.0", ticker
+                )
             page_text = page.inner_text("body")
 
             browser.close()

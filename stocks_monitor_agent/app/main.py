@@ -17,7 +17,6 @@ app = FastAPI()
 @app.get("/ping")
 def handle_ping():
     """Health check endpoint required by AgentCore Runtime."""
-    logger.info("Ping OK")
     return {"status": "Healthy", "time_of_last_update": int(time.time())}
 
 

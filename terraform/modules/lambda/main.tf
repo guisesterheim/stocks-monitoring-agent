@@ -44,7 +44,7 @@ resource "aws_lambda_function" "invoker" {
   package_type  = "Image"
   image_uri     = var.container_image_uri
   architectures = ["arm64"]
-  timeout       = 30
+  timeout       = 300
 
   environment {
     variables = {
