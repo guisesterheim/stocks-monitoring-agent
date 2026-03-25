@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-
 @app.get("/ping")
 def handle_ping():
     """Health check endpoint required by AgentCore Runtime."""
@@ -23,7 +22,7 @@ def handle_ping():
 
 
 @app.post("/invocations")
-async def handle_invocation(request: Request):
+def handle_invocation(request: Request):
     """Handles invocation requests from AgentCore Runtime."""
     try:
         run_stocks_monitor_pipeline()

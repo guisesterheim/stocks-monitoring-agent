@@ -52,8 +52,19 @@ resource "aws_iam_role_policy" "agentcore_runtime_policy" {
       {
         Sid      = "AllowAgentCoreBrowserAccess"
         Effect   = "Allow"
-        Action   = ["bedrock-agentcore:InvokeBrowser"]
-        Resource = ["*"]
+        Action   = [
+          "bedrock-agentcore:StartBrowserSession",
+          "bedrock-agentcore:StopBrowserSession",
+          "bedrock-agentcore:GetBrowserSession",
+          "bedrock-agentcore:ListBrowserSessions",
+          "bedrock-agentcore:UpdateBrowserStream",
+          "bedrock-agentcore:ConnectBrowserAutomationStream",
+          "bedrock-agentcore:ConnectBrowserLiveViewStream"
+        ]
+        Resource = [
+          "arn:aws:bedrock-agentcore:us-east-1:${var.aws_account_id}:browser/*",
+          "arn:aws:bedrock-agentcore:us-east-1:aws:browser/aws.browser.v1"
+        ]
       },
       {
         Sid    = "AllowBedrockModelInvocation"

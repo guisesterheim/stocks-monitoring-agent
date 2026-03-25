@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 python:3.12-slim
+FROM --platform=$BUILDPLATFORM python:3.12-slim
 
 WORKDIR /app
 
@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Playwright Chromium browser binary

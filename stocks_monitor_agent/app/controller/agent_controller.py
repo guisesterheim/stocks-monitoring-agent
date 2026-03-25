@@ -44,7 +44,7 @@ def run_stocks_monitor_pipeline() -> None:
             claude_model_id=config.claude_model_id,
             ticker=stock.ticker,
         )
-
+        
         alert = evaluate_stock_alerts(
             market_data,
             config.daily_drop_threshold_percent,

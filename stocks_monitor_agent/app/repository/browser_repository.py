@@ -1,16 +1,12 @@
 import json
 import logging
-import uuid
 
-import boto3
-from bedrock_agentcore.tools.browser_client import BrowserClient
+from bedrock_agentcore.tools.browser_client import browser_session
 from playwright.sync_api import sync_playwright
 
 from app.model.stock_data import StockMarketData
 
 logger = logging.getLogger(__name__)
-
-BROWSER_IDENTIFIER = "aws.browser.v1"
 
 
 def fetch_stock_market_data_from_cnbc(
@@ -29,19 +25,27 @@ def browse_cnbc_quote_page(aws_region: str, ticker: str) -> str:
     url = f"https://www.cnbc.com/quotes/{ticker}"
     logger.info("Browsing CNBC page for ticker '%s': %s", ticker, url)
 
-    browser_client = BrowserClient(region=aws_region, browser_identifier=BROWSER_IDENTIFIER)
+    with browser_session(aws_region) as client:
+        ws_url, headers = client.generate_ws_headers()
 
-    with sync_playwright() as playwright:
-        ws_url, headers = browser_client.generate_ws_headers()
-        browser = playwright.chromium.connect_over_cdp(ws_url, headers=headers)
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.connect_over_cdp(ws_url, headers=headers)
 
-        context = browser.contexts[0] if browser.contexts else browser.new_context()
-        page = context.pages[0] if context.pages else context.new_page()
+            context = browser.contexts[0] if browser.contexts else browser.new_context()
+            page = context.pages[0] if context.pages else context.new_page()
 
-        page.goto(url, wait_until="networkidle", timeout=30000)
-        page_text = page.inner_text("body")
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
 
-        browser.close()
+            # TODO: test more targeted navigation (commented out for initial testing)
+            # page.get_by_role("button", name="Search quotes, news & videos").click()
+            # search_box = page.locator(".SearchEntry-suggestNotActiveInput.SearchEntry-searchInput.SearchEntry-query")
+            # search_box.fill(ticker)
+            # search_box.press("Enter")
+            # page.wait_for_selector(".QuoteStrip-lastPriceStripContainer", timeout=5000)
+
+            page_text = page.inner_text("body")
+
+            browser.close()
 
     logger.info("Fetched CNBC page content for ticker '%s' (%d chars)", ticker, len(page_text))
     return page_text
@@ -59,8 +63,8 @@ def extract_market_data_with_claude(
         "extract exactly these four values:\n"
         "- current_price: the current stock price as a number\n"
         "- daily_change_percent: the percentage change today (positive = up, negative = down)\n"
-        "- five_day_change_percent: the percentage change over the last 5 days\n"
-        "- thirty_day_change_percent: the percentage change over the last 30 days\n\n"
+        "- five_day_change_percent: the 5 Day percentage return from the RETURNS section (positive = up, negative = down)\n"
+        "- thirty_day_change_percent: the 1 Month percentage return from the RETURNS section (positive = up, negative = down)\n\n"
         "Respond ONLY with a valid JSON object in this exact format, no explanation:\n"
         '{"current_price": 0.0, "daily_change_percent": 0.0, "five_day_change_percent": 0.0, "thirty_day_change_percent": 0.0}\n\n'
         f"Page content:\n{page_content}"

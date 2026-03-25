@@ -27,19 +27,25 @@ terraform -chdir=terraform apply \
 
 # ---- Agent: Docker Build & Push ----------------------------
 
+VERSION="8"
 ECR_AGENT_URL=$(terraform -chdir=terraform output -raw ecr_repository_url)
 
-aws ecr get-login-password --region us-east-1 \
-  | docker login --username AWS --password-stdin "$ECR_AGENT_URL"
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$ECR_AGENT_URL"
 
 docker buildx build \
   --platform linux/arm64 \
   --provenance=false \
-  --output type=image,name="${ECR_AGENT_URL}:latest",push=true \
+  --output type=image,name="${ECR_AGENT_URL}:v${VERSION}",push=true \
   stocks_monitor_agent/
+
+terraform -chdir=terraform apply \
+  -var="container_image_uri=959689756284.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:v${VERSION}" \
+  -var-file="terraform.tfvars"
+
 
 # ---- Lambda Invoker: Docker Build & Push -------------------
 
+VERSION="1"
 ECR_LAMBDA_URL=$(terraform -chdir=terraform output -raw lambda_invoker_ecr_repository_url)
 
 aws ecr get-login-password --region us-east-1 \
@@ -48,12 +54,13 @@ aws ecr get-login-password --region us-east-1 \
 docker buildx build \
   --platform linux/arm64 \
   --provenance=false \
-  --output type=image,name="${ECR_LAMBDA_URL}:latest",push=true \
+  --output type=image,name="${ECR_LAMBDA_URL}:v${VERSION}",push=true \
   lambda_invoker/
 
 # ---- Terraform (full apply — deploys all remaining resources) --------------
 
 terraform -chdir=terraform apply \
+  -var="container_image_uri=959689756284.dkr.ecr.us-east-1.amazonaws.com/stocks-monitor-agent:v${VERSION}" \
   -var-file="terraform.tfvars"
 
 
@@ -67,7 +74,6 @@ aws bedrock-agentcore invoke-agent-runtime \
   --accept "application/json" \
   --payload "$PAYLOAD" \
   output.bin
-
 
 # ---- Local Debug: Run agent container with current AWS session credentials ----
 # Pulls temporary credentials from your active AWS session automatically.
