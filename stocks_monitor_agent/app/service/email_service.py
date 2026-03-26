@@ -47,7 +47,7 @@ def _build_stock_tiles_rows(stocks: list[StockMarketData], stock_quote_url_templ
 
 def _build_stock_tile_html(stock: StockMarketData, stock_quote_url_template: str) -> str:
     """Builds a single stock tile as a table cell with inline styles for Gmail compatibility."""
-    bg_color = "#2e7d32" if stock.daily_change_percent >= 0 else "#c62828"
+    bg_color = "#1b5e20" if stock.daily_change_percent >= 0 else "#7f0000"
     quote_url = stock_quote_url_template.replace("<value>", stock.ticker)
 
     def fmt(value: float) -> str:
