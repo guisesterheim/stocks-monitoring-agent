@@ -36,9 +36,9 @@ recipient_email_addresses = [
   "<recipient-email-2>"
 ]
 
-# SES notification (optional) — leave empty or remove to use SNS only.
-# If provided, SES will be used instead of SNS.
-# The SES identity must already be verified (managed by another repo).
+# SES notification (optional) — leave empty or remove to use SNS only
+# If provided, SES will be used instead of SNS
+# The SES identity must already be verified
 # ses_sender_email_address = "<sender-email>"
 
 # VPC configuration for AgentCore Runtime (private networking)

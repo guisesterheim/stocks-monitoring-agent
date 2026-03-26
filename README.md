@@ -11,7 +11,7 @@ A daily stock market monitor that sends email notifications with price and perfo
 
 ## Architecture
 
-![Architecture Diagram](diagrams/architecture.png)
+![Architecture Diagram](readme_images/architecture.png)
 
 ### Component responsibilities
 
@@ -127,7 +127,15 @@ aws logs put-retention-policy \
 
 ## Done!
 
-By this point you're going to receive the emails every business day at 3:30PM with the configured stocks information
+By this point you're going to receive the emails every business day at 3:30PM with the configured stocks information. This is the notification you can expect once the agent runs:
+
+- With SES:
+
+![Notification with SES](readme_images/notification_ses.png)
+
+- With SNS:
+
+![Notification with SNS](readme_images/notification_sns.png)
 
 ---
 
