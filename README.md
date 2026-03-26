@@ -2,6 +2,11 @@
 
 A daily stock market monitor that sends email notifications with price and performance data for a configurable list of tickers. Built on AWS AgentCore Runtime using Python, Bedrock (Claude), and Playwright.
 
+- [Architecture](#architecture)
+- [How to run](#how-to-run)
+- [Disclaimers](#disclaimers)
+- [Troubleshooting](#troubleshooting)
+
 ---
 
 ## Architecture
