@@ -12,12 +12,12 @@ A daily stock market monitor that sends email notifications with price and perfo
 
 | Component | Responsibility |
 |---|---|
-| EventBridge Scheduler | Invokes the pipeline Mon–Fri at 3:30 PM EST |
+| EventBridge Scheduler | Invokes the Lambda function Mon–Fri at 3:30 PM EST |
 | Lambda | Invokes the AgentCore Runtime session |
 | AgentCore Runtime | Hosts the Python agent container |
 | DynamoDB | Stores the list of tickers to monitor |
-| AgentCore Browser | Headless Chrome — fetches quote pages from CNBC |
-| Bedrock (Claude) | Extracts structured market data from page text |
+| AgentCore Browser | Fetches quote pages from internet |
+| Bedrock (Amazon Nova Micro) | Extracts structured market data from page text |
 | SES / SNS | Delivers the daily email report |
 | ECR | Stores the agent and lambda invoker container images |
 | S3 | Stores Terraform remote state |
@@ -82,6 +82,7 @@ docker buildx build \
 ### 5. Build and push the Lambda invoker image
 
 ```bash
+VERSION="1"
 ECR_LAMBDA_URL=$(terraform -chdir=terraform output -raw lambda_invoker_ecr_repository_url)
 
 aws ecr get-login-password --region us-east-1 \
@@ -105,7 +106,7 @@ terraform -chdir=terraform apply \
 
 ### 7. Set CloudWatch log retention (optional)
 
-These log groups are auto-created by AWS and cannot be managed by Terraform. Run once after the AgentCore Runtime and Lambda are deployed. Update the log group names to match your deployed resources.
+If you intend to run the solution for a long while, make sure you update the CloudWatch Log groups retention policy to avoid expenses with storage. These log groups are auto-created by AWS and cannot be managed by Terraform. Run once after the AgentCore Runtime and Lambda are deployed. Update the log group names to match your deployed resources.
 
 ```bash
 aws logs put-retention-policy \
@@ -119,7 +120,35 @@ aws logs put-retention-policy \
   --retention-in-days 7
 ```
 
-### 8. Invoke manually (optional)
+## Done!
+
+By this point you're going to receive the emails every business day at 3:30PM with the configured stocks information
+
+---
+
+## Disclaimers
+
+### Educational project
+
+This project is intended for **educational and learning purposes only**. It is not production-ready and should not be used to make financial decisions or run in a production environment without significant hardening, testing, and review.
+
+### Terraform best practices
+
+The Terraform code in this repository follows a simplified single-repo structure suitable for a small project. For larger teams or multi-environment setups, consider the code organization patterns described in this article by the author:
+
+[Terraform Code Organization Best Practices](https://guisester.substack.com/p/terraform-code-organization-best-practices-ef43d32eedb1)
+
+Key takeaways from the article:
+- Avoid large state files — split responsibilities into separate configurations
+- Never duplicate module code — reuse modules across configurations
+- Keep code flowing from lower to higher environments (dev → QA → prod) via branches
+- For larger teams, consider one repository per application consuming shared modules from a common modules repository
+
+---
+
+## Troubleshooting 
+
+### 1. Invoke manually (optional)
 
 ```bash
 PAYLOAD=$(echo -n '{"prompt": "run"}' | base64)
@@ -137,7 +166,7 @@ aws bedrock-agentcore invoke-agent-runtime \
 
 > **Tip:** AgentCore Runtime uses session-based containers. The first invocation with a new session ID starts a cold container. Reusing the same session ID on a second call hits the warm container immediately.
 
-### Local debug
+### 2. Local debug (optional)
 
 Run the agent container locally with your AWS session credentials, then invoke it from another terminal.
 
@@ -167,23 +196,3 @@ curl -X POST http://localhost:8080/invocations \
   -H "Content-Type: application/json" \
   -d '{"prompt":"run"}'
 ```
-
----
-
-## Disclaimers
-
-### Educational project
-
-This project is intended for **educational and learning purposes only**. It is not production-ready and should not be used to make financial decisions or run in a production environment without significant hardening, testing, and review.
-
-### Terraform best practices
-
-The Terraform code in this repository follows a simplified single-repo structure suitable for a small project. For larger teams or multi-environment setups, consider the code organization patterns described in this article by the author:
-
-[Terraform Code Organization Best Practices](https://guisester.substack.com/p/terraform-code-organization-best-practices-ef43d32eedb1)
-
-Key takeaways from the article:
-- Avoid large state files — split responsibilities into separate configurations
-- Never duplicate module code — reuse modules across configurations
-- Keep code flowing from lower to higher environments (dev → QA → prod) via branches
-- For larger teams, consider one repository per application consuming shared modules from a common modules repository
