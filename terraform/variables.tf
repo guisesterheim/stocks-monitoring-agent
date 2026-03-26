@@ -45,18 +45,6 @@ variable "container_image_uri" {
   description = "Full URI of the agent container image in ECR (including tag)"
 }
 
-variable "daily_drop_threshold_percent" {
-  type        = number
-  description = "Percentage drop in a single day that invokes a notification"
-  default     = 2
-}
-
-variable "weekly_drop_threshold_percent" {
-  type        = number
-  description = "Percentage drop over 5 trading days that invokes a notification"
-  default     = 5
-}
-
 variable "claude_model_id" {
   type        = string
   description = "Bedrock model ID for Claude to use in the agent"

@@ -10,9 +10,7 @@ class AgentConfig:
         self.stocks_table_name = self._require("STOCKS_TABLE_NAME")
         self.sns_topic_arn = self._require("SNS_TOPIC_ARN")
         self.claude_model_id = self._require("CLAUDE_MODEL_ID")
-        self.daily_drop_threshold_percent = float(self._require("DAILY_DROP_THRESHOLD_PERCENT"))
-        self.weekly_drop_threshold_percent = float(self._require("WEEKLY_DROP_THRESHOLD_PERCENT"))
-
+        
         recipient_json = self._require("RECIPIENT_EMAIL_ADDRESSES")
         self.recipient_email_addresses: list[str] = json.loads(recipient_json)
 

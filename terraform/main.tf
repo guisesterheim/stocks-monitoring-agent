@@ -43,8 +43,6 @@ module "agentcore_runtime" {
   sns_topic_arn                  = module.sns.topic_arn
   sender_email_address           = var.ses_sender_email_address
   recipient_email_addresses_json = jsonencode(var.recipient_email_addresses)
-  daily_drop_threshold_percent   = var.daily_drop_threshold_percent
-  weekly_drop_threshold_percent  = var.weekly_drop_threshold_percent
   claude_model_id                = var.claude_model_id
   subnet_ids                     = var.agentcore_subnet_ids
   security_group_ids             = [module.security_group.security_group_id]

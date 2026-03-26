@@ -139,15 +139,7 @@ This project is intended for **educational and learning purposes only**. It is n
 
 ### Terraform best practices
 
-The Terraform code in this repository follows a simplified single-repo structure suitable for a small project. For larger teams or multi-environment setups, consider the code organization patterns described in this article by the author:
-
-[Terraform Code Organization Best Practices](https://guisester.substack.com/p/terraform-code-organization-best-practices-ef43d32eedb1)
-
-Key takeaways from the article:
-- Avoid large state files — split responsibilities into separate configurations
-- Never duplicate module code — reuse modules across configurations
-- Keep code flowing from lower to higher environments (dev → QA → prod) via branches
-- For larger teams, consider one repository per application consuming shared modules from a common modules repository
+The Terraform code in this repository follows a simplified single-repo structure suitable for a small project. For larger teams or multi-environment setups, consider the code organization patterns recommended [in this article](https://guisester.substack.com/p/terraform-code-organization-best-practices-ef43d32eedb1)
 
 ---
 
@@ -189,8 +181,6 @@ docker run -p 8080:8080 \
   -e SNS_TOPIC_ARN="$SNS_TOPIC_ARN" \
   -e RECIPIENT_EMAIL_ADDRESSES='["your@email.com"]' \
   -e CLAUDE_MODEL_ID="amazon.nova-micro-v1:0" \
-  -e DAILY_DROP_THRESHOLD_PERCENT="2" \
-  -e WEEKLY_DROP_THRESHOLD_PERCENT="5" \
   -e USE_SES="false" \
   "${ECR_AGENT_URL}:v${VERSION}"
 ```

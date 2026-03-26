@@ -24,8 +24,6 @@ resource "awscc_bedrockagentcore_runtime" "stocks_monitor_runtime" {
     SNS_TOPIC_ARN                 = var.sns_topic_arn
     SENDER_EMAIL_ADDRESS          = var.sender_email_address
     RECIPIENT_EMAIL_ADDRESSES     = var.recipient_email_addresses_json
-    DAILY_DROP_THRESHOLD_PERCENT  = tostring(var.daily_drop_threshold_percent)
-    WEEKLY_DROP_THRESHOLD_PERCENT = tostring(var.weekly_drop_threshold_percent)
     CLAUDE_MODEL_ID               = var.claude_model_id
     AWS_REGION_NAME               = "us-east-1"
     USE_SES                       = var.sender_email_address != "" ? "true" : "false"

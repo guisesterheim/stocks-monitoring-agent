@@ -34,16 +34,6 @@ variable "recipient_email_addresses_json" {
   description = "JSON-encoded list of recipient email addresses for SES notifications"
 }
 
-variable "daily_drop_threshold_percent" {
-  type        = number
-  description = "Percentage drop in a single day that invokes a notification"
-}
-
-variable "weekly_drop_threshold_percent" {
-  type        = number
-  description = "Percentage drop over 5 days that invokes a notification"
-}
-
 variable "claude_model_id" {
   type        = string
   description = "Bedrock model ID for Claude (e.g. amazon.nova-micro-v1:0)"
