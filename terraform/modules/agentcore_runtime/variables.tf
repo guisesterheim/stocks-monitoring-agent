@@ -36,12 +36,12 @@ variable "recipient_email_addresses_json" {
 
 variable "daily_drop_threshold_percent" {
   type        = number
-  description = "Percentage drop in a single day that triggers a notification"
+  description = "Percentage drop in a single day that invokes a notification"
 }
 
 variable "weekly_drop_threshold_percent" {
   type        = number
-  description = "Percentage drop over 5 days that triggers a notification"
+  description = "Percentage drop over 5 days that invokes a notification"
 }
 
 variable "claude_model_id" {
@@ -57,4 +57,9 @@ variable "subnet_ids" {
 variable "security_group_ids" {
   type        = list(string)
   description = "List of security group IDs for the AgentCore Runtime VPC configuration"
+}
+
+variable "stock_quote_url_template" {
+  type        = string
+  description = "URL template for stock quote pages. Use <value> as the ticker placeholder."
 }

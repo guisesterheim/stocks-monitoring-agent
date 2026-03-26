@@ -18,6 +18,7 @@ class AgentConfig:
 
         self.sender_email_address = os.environ.get("SENDER_EMAIL_ADDRESS", "")
         self.use_ses = os.environ.get("USE_SES", "false").lower() == "true"
+        self.stock_quote_url_template = self._require("STOCK_QUOTE_URL_TEMPLATE")
 
     @staticmethod
     def _require(name: str) -> str:

@@ -5,5 +5,5 @@ variable "schedule_name" {
 
 variable "lambda_function_arn" {
   type        = string
-  description = "ARN of the Lambda invoker function to trigger on schedule"
+  description = "ARN of the Lambda invoker function to invoke on schedule"
 }

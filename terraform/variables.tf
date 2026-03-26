@@ -47,13 +47,13 @@ variable "container_image_uri" {
 
 variable "daily_drop_threshold_percent" {
   type        = number
-  description = "Percentage drop in a single day that triggers a notification"
+  description = "Percentage drop in a single day that invokes a notification"
   default     = 2
 }
 
 variable "weekly_drop_threshold_percent" {
   type        = number
-  description = "Percentage drop over 5 trading days that triggers a notification"
+  description = "Percentage drop over 5 trading days that invokes a notification"
   default     = 5
 }
 
@@ -87,23 +87,6 @@ variable "eventbridge_schedule_name" {
   description = "Name of the EventBridge Scheduler schedule"
 }
 
-variable "cloudwatch_log_group_name" {
-  type        = string
-  description = "Name of the CloudWatch log group the agent writes diagnostic logs to"
-}
-
-variable "log_retention_days" {
-  type        = number
-  description = "Number of days to retain logs in all CloudWatch log groups"
-  default     = 7
-}
-
-variable "existing_log_group_names" {
-  type        = list(string)
-  description = "List of existing CloudWatch log group names to manage retention on (e.g. Lambda log groups)"
-  default     = []
-}
-
 variable "agentcore_subnet_ids" {
   type        = list(string)
   description = "List of private subnet IDs for the AgentCore Runtime VPC configuration"
@@ -117,4 +100,9 @@ variable "vpc_id" {
 variable "agentcore_security_group_name" {
   type        = string
   description = "Name of the security group to create for the AgentCore Runtime"
+}
+
+variable "stock_quote_url_template" {
+  type        = string
+  description = "URL template for stock quote pages. Use <value> as the ticker placeholder. Example: https://www.cnbc.com/quotes/<value>"
 }

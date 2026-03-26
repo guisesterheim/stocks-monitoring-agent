@@ -4,48 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stocks Monitor Alert</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      padding: 24px;
-      margin: 0;
-    }
-    h1 {
-      color: #333;
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-    .subtitle {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
-    .tiles {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .tile {
-      border-radius: 8px;
-      padding: 14px 18px;
-      min-width: 180px;
-      color: #ffffff;
-      margin-bottom: 4px;
-    }
-    .tile.up   { background-color: #2e7d32; }
-    .tile.down { background-color: #c62828; }
-    .tile .ticker  { font-size: 20px; font-weight: bold; margin-bottom: 6px; }
-    .tile .price   { font-size: 16px; margin-bottom: 10px; }
-    .tile .change  { font-size: 13px; margin-bottom: 3px; }
-    .tile a        { display: inline-block; margin-top: 8px; color: #ffffff; font-size: 12px; opacity: 0.85; }
-  </style>
 </head>
-<body>
-  <h1>Stocks Monitor Alert</h1>
-  <p class="subtitle">Stock prices as of {{TIMESTAMP}}</p>
-  <div class="tiles">
-    {{STOCK_TILES}}
-  </div>
+<body style="font-family: Arial, sans-serif; padding: 24px; margin: 0;">
+  <h1 style="color: #333; font-size: 20px; margin-bottom: 4px;">Stocks Monitor Alert</h1>
+  <p style="color: #666; font-size: 14px; margin-bottom: 24px;">Stock prices as of {{TIMESTAMP}}</p>
+  <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: separate; border-spacing: 12px;">
+    <tbody>
+      {{STOCK_TILES}}
+    </tbody>
+  </table>
 </body>
 </html>

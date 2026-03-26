@@ -29,5 +29,6 @@ resource "awscc_bedrockagentcore_runtime" "stocks_monitor_runtime" {
     CLAUDE_MODEL_ID               = var.claude_model_id
     AWS_REGION_NAME               = "us-east-1"
     USE_SES                       = var.sender_email_address != "" ? "true" : "false"
+    STOCK_QUOTE_URL_TEMPLATE      = var.stock_quote_url_template
   }
 }

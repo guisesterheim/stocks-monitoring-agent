@@ -1,4 +1,4 @@
-resource "aws_scheduler_schedule" "daily_stock_monitor_trigger" {
+resource "aws_scheduler_schedule" "daily_stock_monitor_invoker" {
   name       = var.schedule_name
   group_name = "default"
 
@@ -15,7 +15,7 @@ resource "aws_scheduler_schedule" "daily_stock_monitor_trigger" {
     role_arn = aws_iam_role.scheduler_role.arn
 
     input = jsonencode({
-      trigger = "scheduled_daily_run"
+      run = "scheduled_daily_run"
     })
   }
 }
@@ -52,5 +52,5 @@ resource "aws_lambda_permission" "allow_scheduler" {
   action        = "lambda:InvokeFunction"
   function_name = var.lambda_function_arn
   principal     = "scheduler.amazonaws.com"
-  source_arn    = aws_scheduler_schedule.daily_stock_monitor_trigger.arn
+  source_arn    = aws_scheduler_schedule.daily_stock_monitor_invoker.arn
 }

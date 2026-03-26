@@ -9,7 +9,7 @@ Goal: monitor and notify registered emails about stock market moves over a certa
 - Claude via Bedrock (IAM auth) analyzes the scraped data on every invocation
 - Notifications are sent via SNS (default) or AWS SES (when sender email is configured)
 - Infrastructure is managed with Terraform, bootstrap bucket via CloudFormation
-- EventBridge Scheduler triggers the agent daily at 3:30pm EST
+- EventBridge Scheduler invokes the agent daily at 3:30pm EST
 
 ## AWS Configuration
 
@@ -45,6 +45,7 @@ Goal: monitor and notify registered emails about stock market moves over a certa
 - Document public functions and classes with docstrings
 - Avoid deeply nested code; extract logic into named functions
 - Use type hints throughout
+- Follow the Single Responsibility Principle: each file and function should have one clear reason to change. Controllers orchestrate calls only — they do not build content or send notifications. Business logic (email building, message formatting) lives in service files. I/O (AWS SDK calls) lives in repository files.
 
 ## Code Organization
 
@@ -53,7 +54,8 @@ Use the following folder structure under `app/`:
 ```
 app/
   main.py          # FastAPI server entrypoint, /invocations + /ping, minimal logic
-  controller/      # Request handling, orchestration logic
+  controller/      # Orchestration only — calls service and repository layers, no business logic
+  service/         # Business logic — email building, notification routing, formatting
   model/           # Data structures, domain types
   repository/      # External I/O: AWS SDK calls, browser calls
 ```

@@ -48,6 +48,7 @@ module "agentcore_runtime" {
   claude_model_id                = var.claude_model_id
   subnet_ids                     = var.agentcore_subnet_ids
   security_group_ids             = [module.security_group.security_group_id]
+  stock_quote_url_template       = var.stock_quote_url_template
 }
 
 module "lambda" {
@@ -62,12 +63,4 @@ module "eventbridge" {
   source              = "./modules/eventbridge"
   schedule_name       = var.eventbridge_schedule_name
   lambda_function_arn = module.lambda.function_arn
-}
-
-module "cloudwatch_logs" {
-  source                   = "./modules/cloudwatch_logs"
-  log_retention_days       = var.log_retention_days
-  existing_log_group_names = var.existing_log_group_names
-
-  depends_on = [ module.agentcore_runtime ]
 }

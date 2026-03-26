@@ -17,7 +17,7 @@ def handler(event, context):
     client = boto3.client("bedrock-agentcore", region_name="us-east-1")
 
     session_id = _generate_session_id()
-    payload = json.dumps({"trigger": "scheduled_daily_run"}).encode()
+    payload = json.dumps({"run": "scheduled_daily_run"}).encode()
 
     logger.info("Invoking AgentCore Runtime: %s", runtime_arn)
 
