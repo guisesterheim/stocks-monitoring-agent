@@ -155,8 +155,6 @@ terraform -chdir=terraform destroy -var-file="terraform.tfvars"
 
 All the created AWS resources will be destroyed with this command, except for the S3 bucket that holds the state file. This bucket has to be deleted via the AWS console or CLI.
 
-
-
 ### Terraform best practices
 
 The Terraform code in this repository follows a simplified single-repo structure suitable for a small project. For larger teams or multi-environment setups, consider the code organization patterns recommended [in this article](https://guisester.substack.com/p/terraform-code-organization-best-practices-ef43d32eedb1).
