@@ -145,6 +145,18 @@ By this point you're going to receive the emails every business day at 3:30PM wi
 
 This project is intended for **educational and learning purposes only**. It is not production-ready and should not be used to make financial decisions or run in a production environment without significant hardening, testing, and review.
 
+### AWS Costs
+
+This is a project that will use AWS resources in your account, and therefore will generate costs. To clean up the resources, use the command below:
+
+```bash
+terraform -chdir=terraform destroy -var-file="terraform.tfvars"
+```
+
+All the created AWS resources will be destroyed with this command, except for the S3 bucket that holds the state file. This bucket has to be deleted via the AWS console or CLI.
+
+
+
 ### Terraform best practices
 
 The Terraform code in this repository follows a simplified single-repo structure suitable for a small project. For larger teams or multi-environment setups, consider the code organization patterns recommended [in this article](https://guisester.substack.com/p/terraform-code-organization-best-practices-ef43d32eedb1).
